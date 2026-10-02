@@ -2,6 +2,9 @@ import React from 'react'
 import { MapPin, Phone, MessageSquare, Edit2, Trash2 } from 'lucide-react'
 import { Pelanggan } from '../../types'
 import { deletePelanggan } from '../../services/pelangganService'
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 
 interface Props {
   pelanggan: Pelanggan
@@ -19,60 +22,72 @@ export const PelangganCard: React.FC<Props> = ({ pelanggan, onEdit }) => {
     }
   }
 
-  // Format link direct WhatsApp
-  const waUrl = `https://wa.me/${pelanggan.nomorWhatsapp.startsWith('0') ? '62' + pelanggan.nomorWhatsapp.slice(1) : pelanggan.nomorWhatsapp}`
+  const waUrl = `https://wa.me/${
+    pelanggan.nomorWhatsapp.startsWith('0')
+      ? '62' + pelanggan.nomorWhatsapp.slice(1)
+      : pelanggan.nomorWhatsapp
+  }`
 
   return (
-    <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-2xs hover:border-neutral-300 transition-all">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <h3 className="font-semibold text-neutral-900 text-sm">{pelanggan.nama}</h3>
+    <Card size="sm">
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <CardTitle className="text-base font-semibold text-foreground">
+              {pelanggan.nama}
+            </CardTitle>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-mono">
+                <Phone className="w-3 h-3" />
+                {pelanggan.nomorWhatsapp}
+              </span>
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Badge variant="secondary" className="gap-1 hover:bg-secondary/80">
+                  <MessageSquare className="w-3 h-3 text-emerald-600" />
+                  Chat WA
+                </Badge>
+              </a>
+            </div>
+          </div>
 
-          <div className="mt-1 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-xs text-neutral-600 font-mono">
-              <Phone className="w-3 h-3 text-neutral-400" />
-              {pelanggan.nomorWhatsapp}
-            </span>
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded hover:bg-emerald-100 transition"
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => onEdit(pelanggan)}
+              title="Ubah Pelanggan"
             >
-              <MessageSquare className="w-3 h-3" />
-              Chat WA
-            </a>
+              <Edit2 className="w-3.5 h-3.5 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={handleDelete}
+              title="Hapus Pelanggan"
+              className="hover:text-destructive"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-600" />
+            </Button>
           </div>
+        </div>
+      </CardHeader>
 
-          <div className="mt-2.5 flex items-start gap-1.5 text-xs text-neutral-600">
-            <MapPin className="w-3.5 h-3.5 text-[#C85A32] shrink-0 mt-0.5" />
-            <p className="leading-relaxed">{pelanggan.alamat}</p>
-          </div>
-
-          {pelanggan.catatan && (
-            <p className="mt-1.5 text-[11px] text-neutral-500 bg-neutral-50 p-2 rounded border border-neutral-100 italic">
-              " {pelanggan.catatan} "
-            </p>
-          )}
+      <CardContent className="pt-1 space-y-2">
+        <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+          <p className="leading-relaxed text-foreground/90">{pelanggan.alamat}</p>
         </div>
 
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onEdit(pelanggan)}
-            title="Ubah Pelanggan"
-            className="p-1.5 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg transition"
-          >
-            <Edit2 className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={handleDelete}
-            title="Hapus Pelanggan"
-            className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    </div>
+        {pelanggan.catatan && (
+          <p className="text-[11px] text-muted-foreground bg-muted/40 p-2 rounded-lg border border-border/50 italic">
+            "{pelanggan.catatan}"
+          </p>
+        )}
+      </CardContent>
+    </Card>
   )
 }

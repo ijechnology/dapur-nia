@@ -1,91 +1,99 @@
 import React from 'react'
 import { ChevronRight, Clock, CheckCircle2, Truck, ChefHat, Ban } from 'lucide-react'
 import { Pesanan, OrderStatus } from '../../types'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card'
+import { Badge } from '../ui/badge'
 
 interface Props {
   pesanan: Pesanan
   onClick: (pesanan: Pesanan) => void
 }
 
-const STATUS_BADGE: Record<OrderStatus, { text: string; bg: string; icon: any }> = {
+const STATUS_CONFIG: Record<
+  OrderStatus,
+  { text: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: any }
+> = {
   menunggu_pembayaran: {
     text: 'Menunggu Bayar',
-    bg: 'bg-amber-50 text-amber-800 border-amber-200',
+    variant: 'outline',
     icon: Clock,
   },
   dikonfirmasi: {
     text: 'Dikonfirmasi',
-    bg: 'bg-blue-50 text-blue-800 border-blue-200',
+    variant: 'secondary',
     icon: CheckCircle2,
   },
   diproses: {
     text: 'Dimasak',
-    bg: 'bg-purple-50 text-purple-800 border-purple-200',
+    variant: 'secondary',
     icon: ChefHat,
   },
   dikirim: {
     text: 'Dikirim',
-    bg: 'bg-orange-50 text-orange-800 border-orange-200',
+    variant: 'default',
     icon: Truck,
   },
   selesai: {
     text: 'Selesai',
-    bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    variant: 'default',
     icon: CheckCircle2,
   },
   dibatalkan: {
     text: 'Batal',
-    bg: 'bg-neutral-100 text-neutral-600 border-neutral-200',
+    variant: 'destructive',
     icon: Ban,
   },
 }
 
 export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
-  const badge = STATUS_BADGE[pesanan.status]
-  const Icon = badge.icon
+  const config = STATUS_CONFIG[pesanan.status]
+  const Icon = config.icon
 
   const totalPorsi = pesanan.items.reduce((sum, i) => sum + i.jumlahPorsi, 0)
   const itemsText = pesanan.items.map((i) => `${i.namaMenu} (${i.jumlahPorsi})`).join(', ')
 
   return (
-    <div
+    <Card
+      size="sm"
       onClick={() => onClick(pesanan)}
-      className="p-4 rounded-xl border border-neutral-200 bg-white shadow-2xs hover:border-neutral-300 transition-all cursor-pointer active:scale-99"
+      className="cursor-pointer hover:border-primary/50 transition-all active:scale-99"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-neutral-400">
-              {pesanan.nomorPesanan}
-            </span>
-            <span
-              className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badge.bg}`}
-            >
-              <Icon className="w-3 h-3" />
-              {badge.text}
-            </span>
+      <CardHeader className="pb-1.5">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-muted-foreground">
+                {pesanan.nomorPesanan}
+              </span>
+              <Badge variant={config.variant} className="gap-1 text-[10px] py-0">
+                <Icon className="w-2.5 h-2.5" />
+                {config.text}
+              </Badge>
+            </div>
+
+            <CardTitle className="text-base font-semibold text-foreground mt-1">
+              {pesanan.pelangganSnapshot.nama}
+            </CardTitle>
           </div>
 
-          <h3 className="font-semibold text-neutral-900 text-sm mt-1">
-            {pesanan.pelangganSnapshot.nama}
-          </h3>
+          <ChevronRight className="w-4 h-4 text-muted-foreground mt-1" />
         </div>
+      </CardHeader>
 
-        <ChevronRight className="w-4 h-4 text-neutral-400 mt-1" />
-      </div>
+      <CardContent className="py-1">
+        <p className="text-xs text-muted-foreground line-clamp-1">
+          {itemsText} • Total {totalPorsi} porsi
+        </p>
+      </CardContent>
 
-      <p className="text-xs text-neutral-500 mt-1.5 line-clamp-1">
-        {itemsText} • Total {totalPorsi} porsi
-      </p>
-
-      <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-between text-xs">
-        <span className="text-neutral-400 text-[11px]">
+      <CardFooter className="pt-2 border-t border-border flex items-center justify-between text-xs">
+        <span className="text-muted-foreground text-[11px] font-mono">
           {pesanan.tanggalPesanan}
         </span>
-        <span className="font-bold text-[#C85A32] tabular-nums text-sm">
+        <span className="font-bold text-primary tabular-nums text-sm">
           Rp {pesanan.totalTagihan.toLocaleString('id-ID')}
         </span>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

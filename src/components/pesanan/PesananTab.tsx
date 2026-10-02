@@ -7,6 +7,8 @@ import { subscribePelanggan } from '../../services/pelangganService'
 import { PesananCard } from './PesananCard'
 import { PesananCreateModal } from './PesananCreateModal'
 import { PesananDetailModal } from './PesananDetailModal'
+import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 
 export const PesananTab: React.FC = () => {
   const [pesananList, setPesananList] = useState<Pesanan[]>([])
@@ -48,16 +50,17 @@ export const PesananTab: React.FC = () => {
       {/* Action Header */}
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-bold text-neutral-900">Daftar Pesanan</h2>
-          <p className="text-xs text-neutral-500">Kelola status pesanan & pengiriman katering</p>
+          <h2 className="text-base font-bold text-foreground">Daftar Pesanan</h2>
+          <p className="text-xs text-muted-foreground">Kelola status pesanan & pengiriman katering</p>
         </div>
-        <button
+        <Button
           onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#C85A32] hover:bg-[#b44b25] text-white text-xs font-semibold rounded-lg shadow-xs transition active:scale-95"
+          size="sm"
+          className="gap-1.5 font-semibold"
         >
           <Plus className="w-4 h-4" />
           Pesanan Baru
-        </button>
+        </Button>
       </div>
 
       {/* Filter status tabs */}
@@ -66,23 +69,24 @@ export const PesananTab: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveFilter(tab.id)}
-            className={`px-3 py-1.5 rounded-full font-medium transition whitespace-nowrap ${
-              activeFilter === tab.id
-                ? 'bg-[#1C1E1B] text-white'
-                : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-100'
-            }`}
+            className="cursor-pointer"
           >
-            {tab.label}
+            <Badge
+              variant={activeFilter === tab.id ? 'default' : 'outline'}
+              className="px-3 py-1 cursor-pointer transition text-xs"
+            >
+              {tab.label}
+            </Badge>
           </button>
         ))}
       </div>
 
       {/* Orders List / Empty State */}
       {filteredOrders.length === 0 ? (
-        <div className="p-8 text-center bg-white rounded-xl border border-neutral-200 border-dashed">
-          <ClipboardList className="w-8 h-8 mx-auto text-neutral-300 mb-2" />
-          <p className="text-sm font-semibold text-neutral-700">Tidak ada pesanan</p>
-          <p className="text-xs text-neutral-400 mt-1 max-w-xs mx-auto">
+        <div className="p-8 text-center bg-card rounded-2xl border border-dashed border-border">
+          <ClipboardList className="w-8 h-8 mx-auto text-muted-foreground/60 mb-2" />
+          <p className="text-sm font-semibold text-foreground">Tidak ada pesanan</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
             {activeFilter === 'semua'
               ? 'Belum ada pesanan katering yang tercatat. Klik tombol Pesanan Baru untuk membuat order.'
               : `Tidak ada pesanan dengan status filter "${activeFilter}".`}
