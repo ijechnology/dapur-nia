@@ -1,7 +1,6 @@
 import React from 'react'
 import { ChevronRight, Clock, CheckCircle2, Truck, ChefHat, Ban } from 'lucide-react'
 import { Pesanan, OrderStatus } from '../../types'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card'
 import { Badge } from '../ui/badge'
 
 interface Props {
@@ -53,47 +52,42 @@ export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
   const itemsText = pesanan.items.map((i) => `${i.namaMenu} (${i.jumlahPorsi})`).join(', ')
 
   return (
-    <Card
-      size="sm"
+    <div
       onClick={() => onClick(pesanan)}
-      className="cursor-pointer hover:border-primary/50 transition-all active:scale-99"
+      className="rounded-2xl border border-border bg-card p-4 transition-all shadow-sm hover:shadow-md hover:border-primary/40 cursor-pointer active:scale-99"
     >
-      <CardHeader className="pb-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-muted-foreground">
-                {pesanan.nomorPesanan}
-              </span>
-              <Badge variant={config.variant} className="gap-1 text-[10px] py-0">
-                <Icon className="w-2.5 h-2.5" />
-                {config.text}
-              </Badge>
-            </div>
-
-            <CardTitle className="text-base font-semibold text-foreground mt-1">
-              {pesanan.pelangganSnapshot.nama}
-            </CardTitle>
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono text-muted-foreground">
+              {pesanan.nomorPesanan}
+            </span>
+            <Badge variant={config.variant} className="gap-1 text-[10px] py-0.5">
+              <Icon className="w-2.5 h-2.5" />
+              {config.text}
+            </Badge>
           </div>
 
-          <ChevronRight className="w-4 h-4 text-muted-foreground mt-1" />
+          <h3 className="font-heading text-base font-semibold text-foreground tracking-tight pt-0.5">
+            {pesanan.pelangganSnapshot.nama}
+          </h3>
         </div>
-      </CardHeader>
 
-      <CardContent className="py-1">
-        <p className="text-xs text-muted-foreground line-clamp-1">
-          {itemsText} • Total {totalPorsi} porsi
-        </p>
-      </CardContent>
+        <ChevronRight className="w-4 h-4 text-muted-foreground mt-1" />
+      </div>
 
-      <CardFooter className="pt-2 border-t border-border flex items-center justify-between text-xs">
+      <p className="text-xs text-muted-foreground line-clamp-1 mt-2">
+        {itemsText} • Total {totalPorsi} porsi
+      </p>
+
+      <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between text-xs">
         <span className="text-muted-foreground text-[11px] font-mono">
           {pesanan.tanggalPesanan}
         </span>
         <span className="font-bold text-primary tabular-nums text-sm">
           Rp {pesanan.totalTagihan.toLocaleString('id-ID')}
         </span>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }

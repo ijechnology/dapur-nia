@@ -2,9 +2,8 @@ import React from 'react'
 import { Plus, Minus, Edit2, Trash2 } from 'lucide-react'
 import { Menu } from '../../types'
 import { updatePorsiQuick, deleteMenu } from '../../services/menuService'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
-import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 
 interface Props {
   menu: Menu
@@ -33,79 +32,92 @@ export const MenuCard: React.FC<Props> = ({ menu, onEdit }) => {
   }
 
   return (
-    <Card size="sm" className={isHabis ? 'opacity-80 bg-neutral-50/50' : ''}>
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Badge variant="outline">{menu.kategori}</Badge>
-              {isHabis ? (
-                <Badge variant="destructive">Habis</Badge>
-              ) : (
-                <Badge variant="secondary">Ready {menu.sisaPorsi} porsi</Badge>
-              )}
-            </div>
-            <CardTitle className="text-base font-semibold text-neutral-900 mt-1">
-              {menu.nama}
-            </CardTitle>
+    <div
+      className={`rounded-2xl border bg-card p-4 transition-all shadow-sm ${
+        isHabis ? 'opacity-75 bg-muted/30 border-dashed' : 'border-border hover:shadow-md'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1.5 flex-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Badge variant="outline" className="text-[11px] font-medium px-2.5 py-0.5">
+              {menu.kategori}
+            </Badge>
+            {isHabis ? (
+              <Badge variant="destructive" className="text-[11px] font-medium px-2.5 py-0.5">
+                Habis
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[11px] font-medium px-2.5 py-0.5">
+                Ready {menu.sisaPorsi} porsi
+              </Badge>
+            )}
           </div>
 
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={() => onEdit(menu)}
-              title="Ubah Menu"
-            >
-              <Edit2 className="w-3.5 h-3.5 text-neutral-500" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={handleDelete}
-              title="Hapus Menu"
-              className="hover:text-destructive"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-neutral-500 hover:text-red-600" />
-            </Button>
+          <h3 className="font-heading text-base font-semibold text-foreground tracking-tight pt-0.5">
+            {menu.nama}
+          </h3>
+
+          {menu.deskripsi && (
+            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+              {menu.deskripsi}
+            </p>
+          )}
+
+          <div className="pt-1 text-base font-bold text-primary tabular-nums">
+            Rp {menu.harga.toLocaleString('id-ID')}
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="py-1">
-        {menu.deskripsi && (
-          <CardDescription className="text-xs text-neutral-500 line-clamp-2">
-            {menu.deskripsi}
-          </CardDescription>
-        )}
-        <div className="mt-2 text-base font-bold text-primary tabular-nums">
-          Rp {menu.harga.toLocaleString('id-ID')}
+        {/* Tombol Aksi */}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => onEdit(menu)}
+            title="Ubah Menu"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Edit2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleDelete}
+            title="Hapus Menu"
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
-      </CardContent>
+      </div>
 
-      <CardFooter className="pt-2 border-t border-border flex items-center justify-between">
+      {/* Bagian Bawah: Kontrol Porsi */}
+      <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between">
         <span className="text-xs text-muted-foreground font-medium">Sisa Porsi:</span>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="icon-xs"
+            size="icon-sm"
             onClick={() => handlePorsiDelta(-1)}
             disabled={menu.sisaPorsi <= 0}
+            className="rounded-lg"
           >
-            <Minus className="w-3 h-3" />
+            <Minus className="w-3.5 h-3.5" />
           </Button>
-          <span className="w-8 text-center text-xs font-bold text-foreground tabular-nums">
+          <span className="w-8 text-center text-sm font-bold text-foreground tabular-nums">
             {menu.sisaPorsi}
           </span>
           <Button
             variant="outline"
-            size="icon-xs"
+            size="icon-sm"
             onClick={() => handlePorsiDelta(1)}
+            className="rounded-lg"
           >
-            <Plus className="w-3 h-3" />
+            <Plus className="w-3.5 h-3.5" />
           </Button>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }
