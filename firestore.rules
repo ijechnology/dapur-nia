@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Mode latihan Sesi 3 Dapur Nia: baca dan tulis terbuka untuk CRUD
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
