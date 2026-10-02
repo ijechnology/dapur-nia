@@ -6,8 +6,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  serverTimestamp,
-  writeBatch
+  serverTimestamp
 } from 'firebase/firestore'
 import { getFirebaseDb } from '../lib/firebase'
 import { Pesanan, OrderStatus, OrderItem } from '../types'

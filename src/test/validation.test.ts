@@ -7,7 +7,7 @@ import {
   calculateOrderTotal,
   calculateDailyReport
 } from '../lib/validation'
-import { Menu, Pesanan, OrderItem } from '../types'
+import { Pesanan, OrderItem } from '../types'
 
 describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
   describe('Invarian Menu', () => {

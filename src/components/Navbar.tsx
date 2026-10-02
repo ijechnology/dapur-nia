@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Database, Settings2 } from 'lucide-react'
+import { Settings2 } from 'lucide-react'
 import { getFirebaseDb, getStoredFirebaseConfig } from '../lib/firebase'
 import { FirebaseConfigModal } from './FirebaseConfigModal'
 

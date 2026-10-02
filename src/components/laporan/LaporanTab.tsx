@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Calendar, DollarSign, PackageCheck, AlertCircle, ShoppingCart } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Calendar, DollarSign, PackageCheck, ShoppingCart } from 'lucide-react'
 import { Pesanan, DailyReportSummary } from '../../types'
 import { subscribePesanan } from '../../services/pesananService'
 import { calculateDailyReport } from '../../lib/validation'

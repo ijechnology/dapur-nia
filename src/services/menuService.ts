@@ -7,8 +7,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  serverTimestamp,
-  Firestore
+  serverTimestamp
 } from 'firebase/firestore'
 import { getFirebaseDb } from '../lib/firebase'
 import { Menu } from '../types'

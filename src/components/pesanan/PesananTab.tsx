@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, ClipboardList } from 'lucide-react'
-import { Pesanan, Menu, Pelanggan, OrderStatus } from '../../types'
+import { Pesanan, Menu, Pelanggan } from '../../types'
 import { subscribePesanan } from '../../services/pesananService'
 import { subscribeMenus } from '../../services/menuService'
 import { subscribePelanggan } from '../../services/pelangganService'
