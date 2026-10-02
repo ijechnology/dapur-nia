@@ -10,24 +10,15 @@ export interface FirebaseConfig {
   appId: string
 }
 
-const STORAGE_KEY = 'dapur_nia_firebase_config'
+export function getEnvFirebaseConfig(): FirebaseConfig | null {
+  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID
 
-export function getStoredFirebaseConfig(): FirebaseConfig | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      return JSON.parse(raw) as FirebaseConfig
-    }
-  } catch (err) {
-    console.error('Gagal membaca firebase config dari storage', err)
-  }
-
-  // Fallback ke Vite env jika tersedia
-  if (import.meta.env.VITE_FIREBASE_API_KEY && import.meta.env.VITE_FIREBASE_PROJECT_ID) {
+  if (apiKey && projectId) {
     return {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      apiKey,
       authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      projectId,
       storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
       messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
       appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
@@ -37,24 +28,13 @@ export function getStoredFirebaseConfig(): FirebaseConfig | null {
   return null
 }
 
-export function saveFirebaseConfig(config: FirebaseConfig): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
-  // Refresh page agar singleton app ter-reinisialisasi
-  window.location.reload()
-}
-
-export function clearFirebaseConfig(): void {
-  localStorage.removeItem(STORAGE_KEY)
-  window.location.reload()
-}
-
 let appInstance: FirebaseApp | null = null
 let dbInstance: Firestore | null = null
 
 export function getFirebaseDb(): Firestore | null {
   if (dbInstance) return dbInstance
 
-  const config = getStoredFirebaseConfig()
+  const config = getEnvFirebaseConfig()
   if (!config || !config.apiKey || !config.projectId) {
     return null
   }
