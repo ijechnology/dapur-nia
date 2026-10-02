@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 98%;
+    --foreground: 150 5% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 150 5% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 5% 12%;
+
+    --primary: 16 63% 49%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 150 5% 15%;
+
+    --muted: 40 10% 92%;
+    --muted-foreground: 150 4% 45%;
+
+    --accent: 35 25% 92%;
+    --accent-foreground: 16 63% 35%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 40 10% 88%;
+    --input: 40 10% 88%;
+    --ring: 16 63% 49%;
+
+    --radius: 0.5rem;
+  }
+}
+
+body {
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Custom crisp utility */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
