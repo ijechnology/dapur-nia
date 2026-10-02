@@ -29,7 +29,6 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
 
       expect(validateMenuInput(invalidPorsi).isValid).toBe(false)
       expect(validateMenuInput(invalidPorsi).error).toContain('Porsi')
-      // Porsi 0 sah (status habis)
       expect(validateMenuInput(zeroPorsi).isValid).toBe(true)
     })
 
@@ -56,29 +55,18 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
     })
   })
 
-  describe('Invarian & Mesin Transisi Status Pesanan', () => {
+  describe('Invarian & Mesin Transisi Status Pesanan (4 Tahap)', () => {
     it('mengizinkan transisi maju yang sah', () => {
       expect(canTransitionStatus('menunggu_pembayaran', 'dikonfirmasi')).toBe(true)
       expect(canTransitionStatus('dikonfirmasi', 'diproses')).toBe(true)
-      expect(canTransitionStatus('diproses', 'dikirim')).toBe(true)
-      expect(canTransitionStatus('dikirim', 'selesai')).toBe(true)
-    })
-
-    it('mengizinkan pembatalan hanya dari status awal', () => {
-      expect(canTransitionStatus('menunggu_pembayaran', 'dibatalkan')).toBe(true)
-      expect(canTransitionStatus('dikonfirmasi', 'dibatalkan')).toBe(true)
-      // Tidak boleh membatalkan pesanan yang sudah dikirim atau selesai
-      expect(canTransitionStatus('dikirim', 'dibatalkan')).toBe(false)
-      expect(canTransitionStatus('selesai', 'dibatalkan')).toBe(false)
+      expect(canTransitionStatus('diproses', 'selesai')).toBe(true)
     })
 
     it('menolak transisi melompat atau mundur', () => {
-      // Melompat
       expect(canTransitionStatus('menunggu_pembayaran', 'selesai')).toBe(false)
-      expect(canTransitionStatus('dikonfirmasi', 'dikirim')).toBe(false)
-      // Mundur
+      expect(canTransitionStatus('menunggu_pembayaran', 'diproses')).toBe(false)
       expect(canTransitionStatus('diproses', 'dikonfirmasi')).toBe(false)
-      expect(canTransitionStatus('selesai', 'dikirim')).toBe(false)
+      expect(canTransitionStatus('selesai', 'diproses')).toBe(false)
     })
   })
 
@@ -92,13 +80,13 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
       expect(total).toBe(60000)
     })
 
-    it('mengembalikan 0 atau error jika tidak ada item', () => {
+    it('mengembalikan 0 jika tidak ada item', () => {
       expect(calculateOrderTotal([], 10000)).toBe(0)
     })
   })
 
   describe('Agregasi Modul Laporan Harian', () => {
-    it('mengakumulasi omset dan porsi terjual, serta mengabaikan pesanan dibatalkan', () => {
+    it('mengakumulasi omset dan porsi terjual', () => {
       const orders: Pesanan[] = [
         {
           id: '1',
@@ -126,16 +114,16 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
           totalTagihan: 65000,
           tanggalPesanan: '2026-10-02',
           waktuPesan: new Date(),
-          status: 'dibatalkan' // HARUS DIABAIKAN
+          status: 'diproses'
         }
       ]
 
       const report = calculateDailyReport(orders)
-      expect(report.totalOmset).toBe(45000)
-      expect(report.totalPorsiTerjual).toBe(2)
-      expect(report.totalPesananSukses).toBe(1)
-      expect(report.itemSales['m1'].porsi).toBe(2)
-      expect(report.itemSales['m1'].nominal).toBe(40000)
+      expect(report.totalOmset).toBe(110000)
+      expect(report.totalPorsiTerjual).toBe(5)
+      expect(report.totalPesananSukses).toBe(2)
+      expect(report.itemSales['m1'].porsi).toBe(5)
+      expect(report.itemSales['m1'].nominal).toBe(100000)
     })
   })
 })

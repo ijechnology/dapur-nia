@@ -1,7 +1,8 @@
 import React from 'react'
-import { Plus, Minus, Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 import { Menu } from '../../types'
-import { updatePorsiQuick, deleteMenu } from '../../services/menuService'
+import { deleteMenu } from '../../services/menuService'
+import { useAlert } from '../../context/AlertContext'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 
@@ -12,21 +13,15 @@ interface Props {
 
 export const MenuCard: React.FC<Props> = ({ menu, onEdit }) => {
   const isHabis = menu.sisaPorsi <= 0
-
-  const handlePorsiDelta = async (delta: number) => {
-    try {
-      await updatePorsiQuick(menu.id, delta)
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  const { showAlert } = useAlert()
 
   const handleDelete = async () => {
     if (confirm(`Yakin ingin menghapus menu "${menu.nama}"?`)) {
       try {
         await deleteMenu(menu.id)
-      } catch (err) {
-        console.error(err)
+        showAlert('Menu Dihapus', `Menu "${menu.nama}" berhasil dihapus.`)
+      } catch (err: any) {
+        showAlert('Gagal Menghapus', err.message, 'destructive')
       }
     }
   }
@@ -69,7 +64,7 @@ export const MenuCard: React.FC<Props> = ({ menu, onEdit }) => {
           </div>
         </div>
 
-        {/* Tombol Aksi */}
+        {/* Tombol Aksi Edit & Hapus */}
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -92,31 +87,12 @@ export const MenuCard: React.FC<Props> = ({ menu, onEdit }) => {
         </div>
       </div>
 
-      {/* Bagian Bawah: Kontrol Porsi */}
-      <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between">
-        <span className="text-xs text-muted-foreground font-medium">Sisa Porsi:</span>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => handlePorsiDelta(-1)}
-            disabled={menu.sisaPorsi <= 0}
-            className="rounded-lg"
-          >
-            <Minus className="w-3.5 h-3.5" />
-          </Button>
-          <span className="w-8 text-center text-sm font-bold text-foreground tabular-nums">
-            {menu.sisaPorsi}
-          </span>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => handlePorsiDelta(1)}
-            className="rounded-lg"
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </Button>
-        </div>
+      {/* Bagian Bawah: Informasi Sisa Porsi (Tanpa Button +/- sesuai permintaan poin 3) */}
+      <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between text-xs">
+        <span className="text-muted-foreground font-medium">Sisa Porsi Tersedia:</span>
+        <span className="font-bold text-foreground tabular-nums text-sm">
+          {menu.sisaPorsi} porsi
+        </span>
       </div>
     </div>
   )

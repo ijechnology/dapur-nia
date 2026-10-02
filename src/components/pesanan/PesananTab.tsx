@@ -31,13 +31,13 @@ export const PesananTab: React.FC = () => {
     }
   }, [])
 
+  // 4 Status Filters: menunggu_pembayaran, dikonfirmasi, diproses, selesai (Poin 2)
   const filterTabs = [
     { id: 'semua', label: 'Semua' },
     { id: 'menunggu_pembayaran', label: 'Menunggu Bayar' },
-    { id: 'diproses', label: 'Dimasak' },
-    { id: 'dikirim', label: 'Dikirim' },
+    { id: 'dikonfirmasi', label: 'Dikonfirmasi' },
+    { id: 'diproses', label: 'Diproses' },
     { id: 'selesai', label: 'Selesai' },
-    { id: 'dibatalkan', label: 'Batal' },
   ]
 
   const filteredOrders = pesananList.filter((order) => {
@@ -51,7 +51,7 @@ export const PesananTab: React.FC = () => {
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-bold text-foreground">Daftar Pesanan</h2>
-          <p className="text-xs text-muted-foreground">Kelola status pesanan & pengiriman katering</p>
+          <p className="text-xs text-muted-foreground">Kelola status pesanan & katering</p>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
@@ -63,7 +63,7 @@ export const PesananTab: React.FC = () => {
         </Button>
       </div>
 
-      {/* Filter status tabs */}
+      {/* Filter status tabs dengan styling pill bulat konsisten (Poin 4) */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
         {filterTabs.map((tab) => (
           <button
@@ -73,7 +73,7 @@ export const PesananTab: React.FC = () => {
           >
             <Badge
               variant={activeFilter === tab.id ? 'default' : 'outline'}
-              className="px-3 py-1 cursor-pointer transition text-xs"
+              className="px-3.5 py-1.5 cursor-pointer transition text-xs font-medium rounded-full"
             >
               {tab.label}
             </Badge>
@@ -83,7 +83,7 @@ export const PesananTab: React.FC = () => {
 
       {/* Orders List / Empty State */}
       {filteredOrders.length === 0 ? (
-        <div className="p-8 text-center bg-card rounded-2xl border border-dashed border-border">
+        <div className="p-8 text-center bg-card rounded-2xl border border-dashed border-border shadow-sm">
           <ClipboardList className="w-8 h-8 mx-auto text-muted-foreground/60 mb-2" />
           <p className="text-sm font-semibold text-foreground">Tidak ada pesanan</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">

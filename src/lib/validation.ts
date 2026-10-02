@@ -36,18 +36,17 @@ export function isValidWhatsApp(phone: string): boolean {
 }
 
 /**
- * Finite State Machine untuk transisi status pesanan
+ * Finite State Machine untuk transisi status pesanan:
+ * menunggu_pembayaran -> dikonfirmasi -> diproses -> selesai
  */
 export function canTransitionStatus(current: OrderStatus, next: OrderStatus): boolean {
   if (current === next) return true
 
   const transitions: Record<OrderStatus, OrderStatus[]> = {
-    menunggu_pembayaran: ['dikonfirmasi', 'dibatalkan'],
-    dikonfirmasi: ['diproses', 'dibatalkan'],
-    diproses: ['dikirim'],
-    dikirim: ['selesai'],
+    menunggu_pembayaran: ['dikonfirmasi'],
+    dikonfirmasi: ['diproses'],
+    diproses: ['selesai'],
     selesai: [],
-    dibatalkan: [],
   }
 
   return transitions[current]?.includes(next) ?? false
@@ -63,16 +62,14 @@ export function calculateOrderTotal(items: OrderItem[], ongkosKirim: number): nu
 }
 
 /**
- * Agregasi laporan harian (mengecualikan pesanan dibatalkan)
+ * Agregasi laporan harian
  */
 export function calculateDailyReport(orders: Pesanan[], targetDate: string = ''): DailyReportSummary {
-  const activeOrders = orders.filter(o => o.status !== 'dibatalkan')
-
   let totalOmset = 0
   let totalPorsiTerjual = 0
   const itemSales: Record<string, { namaMenu: string; porsi: number; nominal: number }> = {}
 
-  for (const order of activeOrders) {
+  for (const order of orders) {
     totalOmset += order.totalTagihan
 
     for (const item of order.items) {
@@ -93,7 +90,7 @@ export function calculateDailyReport(orders: Pesanan[], targetDate: string = '')
     tanggal: targetDate,
     totalOmset,
     totalPorsiTerjual,
-    totalPesananSukses: activeOrders.length,
+    totalPesananSukses: orders.length,
     itemSales,
   }
 }

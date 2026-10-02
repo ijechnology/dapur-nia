@@ -23,9 +23,7 @@ export type OrderStatus =
   | 'menunggu_pembayaran'
   | 'dikonfirmasi'
   | 'diproses'
-  | 'dikirim'
   | 'selesai'
-  | 'dibatalkan'
 
 export interface OrderItem {
   menuId: string

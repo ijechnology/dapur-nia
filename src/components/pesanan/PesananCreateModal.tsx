@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import { X, Plus, Minus, ShoppingBag, Check } from 'lucide-react'
+import { Plus, Minus, ShoppingBag, Check, X } from 'lucide-react'
 import { Menu, Pelanggan, OrderItem } from '../../types'
 import { createPesanan } from '../../services/pesananService'
+import { useAlert } from '../../context/AlertContext'
+import { Button } from '../ui/button'
 
 interface Props {
   isOpen: boolean
@@ -23,6 +25,8 @@ export const PesananCreateModal: React.FC<Props> = ({
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const { showAlert } = useAlert()
+
   if (!isOpen) return null
 
   const handleQtyChange = (menuId: string, delta: number, maxStok: number) => {
@@ -30,7 +34,7 @@ export const PesananCreateModal: React.FC<Props> = ({
     const next = current + delta
     if (next < 0) return
     if (next > maxStok) {
-      alert(`Stok hanya tersisa ${maxStok} porsi!`)
+      showAlert('Stok Terbatas', `Stok ${menuList.find(m => m.id === menuId)?.nama || ''} hanya tersisa ${maxStok} porsi!`, 'destructive')
       return
     }
     if (next === 0) {
@@ -86,50 +90,54 @@ export const PesananCreateModal: React.FC<Props> = ({
         ongkosKirim: ongkir || 0,
         catatanPesanan: catatan,
       })
-      // Reset form
+      // Reset form & pemicu Alert Berhasil + Tutup Modal (Poin 5 & 6)
       setCart({})
       setSelectedPelangganId('')
       setCatatan('')
+      showAlert('Pesanan Dibuat', `Pesanan untuk ${pelanggan.nama} berhasil disimpan dengan status Menunggu Pembayaran.`)
       onClose()
     } catch (err: any) {
       setErrorMsg(err.message || 'Gagal membuat pesanan')
+      showAlert('Gagal Membuat Pesanan', err.message || 'Terjadi kesalahan', 'destructive')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="bg-white w-full max-w-lg rounded-xl border border-neutral-200 shadow-xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-card w-full max-w-lg rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100 bg-neutral-50/50">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-[#C85A32]" />
-            <h2 className="font-semibold text-neutral-800 text-sm">Buat Pesanan Katering Baru</h2>
+            <ShoppingBag className="w-5 h-5 text-primary" />
+            <h2 className="font-heading font-semibold text-foreground text-sm">Buat Pesanan Katering Baru</h2>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
             onClick={onClose}
-            className="p-1 text-neutral-400 hover:text-neutral-700 rounded-lg hover:bg-neutral-100"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <X className="w-5 h-5" />
-          </button>
+            <X className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-4 text-sm">
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs font-medium">
+            <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-xs font-medium">
               {errorMsg}
             </div>
           )}
 
           {/* 1. Pilih Pelanggan */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Pilih Pelanggan <span className="text-red-500">*</span>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">
+              Pilih Pelanggan <span className="text-destructive">*</span>
             </label>
             {pelangganList.length === 0 ? (
-              <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+              <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                 Belum ada data pelanggan. Tambahkan pelanggan terlebih dahulu di tab Pelanggan.
               </p>
             ) : (
@@ -137,7 +145,7 @@ export const PesananCreateModal: React.FC<Props> = ({
                 required
                 value={selectedPelangganId}
                 onChange={(e) => setSelectedPelangganId(e.target.value)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-xs bg-white"
+                className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-xs"
               >
                 <option value="">-- Pilih Nama Pelanggan --</option>
                 {pelangganList.map((p) => (
@@ -151,12 +159,12 @@ export const PesananCreateModal: React.FC<Props> = ({
 
           {/* 2. Pilih Menu & Porsi */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
-              Pilih Menu & Jumlah Porsi <span className="text-red-500">*</span>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">
+              Pilih Menu & Jumlah Porsi <span className="text-destructive">*</span>
             </label>
-            <div className="border border-neutral-200 rounded-xl divide-y divide-neutral-100 max-h-56 overflow-y-auto bg-neutral-50/40">
+            <div className="border border-border rounded-xl divide-y divide-border max-h-56 overflow-y-auto bg-muted/20">
               {menuList.length === 0 ? (
-                <div className="p-4 text-center text-xs text-neutral-400">
+                <div className="p-4 text-center text-xs text-muted-foreground">
                   Belum ada menu yang tersedia.
                 </div>
               ) : (
@@ -167,21 +175,21 @@ export const PesananCreateModal: React.FC<Props> = ({
                   return (
                     <div
                       key={menu.id}
-                      className="p-3 flex items-center justify-between gap-2 hover:bg-neutral-100/50 transition"
+                      className="p-3 flex items-center justify-between gap-2 hover:bg-muted/40 transition"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-neutral-900 truncate">
+                        <p className="text-xs font-semibold text-foreground truncate">
                           {menu.nama}
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs text-[#C85A32] font-semibold tabular-nums">
+                          <span className="text-xs text-primary font-semibold tabular-nums">
                             Rp {menu.harga.toLocaleString('id-ID')}
                           </span>
                           <span
                             className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
                               isHabis
-                                ? 'bg-neutral-200 text-neutral-600'
-                                : 'bg-emerald-50 text-emerald-800'
+                                ? 'bg-muted text-muted-foreground'
+                                : 'bg-secondary text-secondary-foreground'
                             }`}
                           >
                             Stok: {menu.sisaPorsi}
@@ -191,25 +199,29 @@ export const PesananCreateModal: React.FC<Props> = ({
 
                       {/* Counter */}
                       <div className="flex items-center gap-2">
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
+                          size="icon-xs"
                           onClick={() => handleQtyChange(menu.id, -1, menu.sisaPorsi)}
                           disabled={qty <= 0}
-                          className="w-6 h-6 rounded border border-neutral-300 flex items-center justify-center text-neutral-700 hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent"
+                          className="rounded-lg"
                         >
                           <Minus className="w-3 h-3" />
-                        </button>
+                        </Button>
                         <span className="w-6 text-center text-xs font-bold tabular-nums">
                           {qty}
                         </span>
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
+                          size="icon-xs"
                           onClick={() => handleQtyChange(menu.id, 1, menu.sisaPorsi)}
                           disabled={isHabis || qty >= menu.sisaPorsi}
-                          className="w-6 h-6 rounded border border-neutral-300 flex items-center justify-center text-neutral-700 hover:bg-neutral-200 disabled:opacity-30 disabled:hover:bg-transparent"
+                          className="rounded-lg"
                         >
                           <Plus className="w-3 h-3" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )
@@ -221,7 +233,7 @@ export const PesananCreateModal: React.FC<Props> = ({
           {/* 3. Ongkos Kirim & Catatan */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
                 Ongkos Kirim (Rp)
               </label>
               <input
@@ -230,11 +242,11 @@ export const PesananCreateModal: React.FC<Props> = ({
                 step="1000"
                 value={ongkir}
                 onChange={(e) => setOngkir(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-xs font-mono"
+                className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-xs font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
                 Catatan Pesanan
               </label>
               <input
@@ -242,50 +254,52 @@ export const PesananCreateModal: React.FC<Props> = ({
                 placeholder="Tanpa pedas, jam 12, dll."
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-xs"
+                className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-xs"
               />
             </div>
           </div>
 
           {/* Ringkasan Total */}
-          <div className="p-3.5 bg-neutral-100 rounded-xl space-y-1.5 text-xs">
-            <div className="flex justify-between text-neutral-600">
+          <div className="p-3.5 bg-muted/40 rounded-xl space-y-1.5 text-xs border border-border">
+            <div className="flex justify-between text-muted-foreground">
               <span>Subtotal Makanan:</span>
-              <span className="font-semibold tabular-nums">
+              <span className="font-semibold tabular-nums text-foreground">
                 Rp {subtotal.toLocaleString('id-ID')}
               </span>
             </div>
-            <div className="flex justify-between text-neutral-600">
+            <div className="flex justify-between text-muted-foreground">
               <span>Ongkos Kirim:</span>
-              <span className="font-semibold tabular-nums">
+              <span className="font-semibold tabular-nums text-foreground">
                 Rp {(ongkir || 0).toLocaleString('id-ID')}
               </span>
             </div>
-            <div className="pt-2 border-t border-neutral-200 flex justify-between font-bold text-sm text-neutral-900">
+            <div className="pt-2 border-t border-border flex justify-between font-bold text-sm text-foreground">
               <span>Total Tagihan:</span>
-              <span className="text-[#C85A32] tabular-nums">
+              <span className="text-primary tabular-nums">
                 Rp {totalTagihan.toLocaleString('id-ID')}
               </span>
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="pt-3 border-t border-neutral-100 flex items-center justify-end gap-2">
-            <button
+          <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-lg transition"
             >
               Batal
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              size="sm"
               disabled={loading || items.length === 0 || !selectedPelangganId}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-[#C85A32] hover:bg-[#b44b25] rounded-lg shadow-sm transition active:scale-98 disabled:opacity-40"
+              className="gap-1.5 font-semibold"
             >
               <Check className="w-4 h-4" />
               Simpan Pesanan
-            </button>
+            </Button>
           </div>
         </form>
       </div>

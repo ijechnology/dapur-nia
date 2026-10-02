@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronRight, Clock, CheckCircle2, Truck, ChefHat, Ban } from 'lucide-react'
+import { ChevronRight, Clock, CheckCircle2, ChefHat } from 'lucide-react'
 import { Pesanan, OrderStatus } from '../../types'
 import { Badge } from '../ui/badge'
 
@@ -23,29 +23,19 @@ const STATUS_CONFIG: Record<
     icon: CheckCircle2,
   },
   diproses: {
-    text: 'Dimasak',
+    text: 'Diproses',
     variant: 'secondary',
     icon: ChefHat,
-  },
-  dikirim: {
-    text: 'Dikirim',
-    variant: 'default',
-    icon: Truck,
   },
   selesai: {
     text: 'Selesai',
     variant: 'default',
     icon: CheckCircle2,
   },
-  dibatalkan: {
-    text: 'Batal',
-    variant: 'destructive',
-    icon: Ban,
-  },
 }
 
 export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
-  const config = STATUS_CONFIG[pesanan.status]
+  const config = STATUS_CONFIG[pesanan.status] || STATUS_CONFIG.menunggu_pembayaran
   const Icon = config.icon
 
   const totalPorsi = pesanan.items.reduce((sum, i) => sum + i.jumlahPorsi, 0)

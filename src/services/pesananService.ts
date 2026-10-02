@@ -173,17 +173,10 @@ export async function updatePesananStatus(
   pesananId: string,
   currentStatus: OrderStatus,
   nextStatus: OrderStatus,
-  itemsToRefundIfCancelled?: OrderItem[]
+  _items?: OrderItem[]
 ): Promise<void> {
   if (!canTransitionStatus(currentStatus, nextStatus)) {
     throw new Error(`Transisi status dari "${currentStatus}" ke "${nextStatus}" tidak diperbolehkan!`)
-  }
-
-  // Jika dibatalkan, kembalikan stok sisa porsi ke menu
-  if (nextStatus === 'dibatalkan' && itemsToRefundIfCancelled) {
-    for (const item of itemsToRefundIfCancelled) {
-      await updatePorsiQuick(item.menuId, item.jumlahPorsi)
-    }
   }
 
   const db = getFirebaseDb()

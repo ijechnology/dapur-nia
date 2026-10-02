@@ -17,7 +17,7 @@ export const BottomNav: React.FC<Props> = ({ activeTab, onTabChange }) => {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border">
       <div className="max-w-md mx-auto h-16 px-4 flex items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon
@@ -27,15 +27,15 @@ export const BottomNav: React.FC<Props> = ({ activeTab, onTabChange }) => {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-all ${
+              className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-all cursor-pointer ${
                 isActive
-                  ? 'text-[#C85A32] font-bold scale-102'
-                  : 'text-neutral-400 hover:text-neutral-700 font-medium'
+                  ? 'text-primary font-bold scale-102'
+                  : 'text-muted-foreground hover:text-foreground font-medium'
               }`}
             >
               <div
                 className={`p-1 rounded-xl transition ${
-                  isActive ? 'bg-orange-50' : 'bg-transparent'
+                  isActive ? 'bg-primary/10' : 'bg-transparent'
                 }`}
               >
                 <Icon className="w-5 h-5" />

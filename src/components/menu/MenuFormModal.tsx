@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { X, Check } from 'lucide-react'
 import { Menu } from '../../types'
 import { createMenu, updateMenu } from '../../services/menuService'
+import { useAlert } from '../../context/AlertContext'
+import { Button } from '../ui/button'
 
 interface Props {
   isOpen: boolean
@@ -19,6 +21,8 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
   const [kategori, setKategori] = useState('Lauk')
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const { showAlert } = useAlert()
 
   useEffect(() => {
     if (menuToEdit) {
@@ -70,6 +74,7 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
           sisaPorsi: porsiNum,
           kategori,
         })
+        showAlert('Menu Diperbarui', `Menu "${nama}" berhasil diupdate.`)
       } else {
         await createMenu({
           nama: nama.trim(),
@@ -79,42 +84,46 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
           kategori,
           tersedia: porsiNum > 0,
         })
+        showAlert('Menu Ditambahkan', `Menu "${nama}" berhasil disimpan.`)
       }
       onClose()
     } catch (err: any) {
       setErrorMsg(err.message || 'Gagal menyimpan menu')
+      showAlert('Gagal Menyimpan Menu', err.message || 'Terjadi kesalahan', 'destructive')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="bg-white w-full max-w-md rounded-xl border border-neutral-200 shadow-xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100 bg-neutral-50/50">
-          <h2 className="font-semibold text-neutral-800 text-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
+          <h2 className="font-heading font-semibold text-foreground text-sm">
             {menuToEdit ? 'Ubah Menu Katering' : 'Tambah Menu Baru'}
           </h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
             onClick={onClose}
-            className="p-1 text-neutral-400 hover:text-neutral-700 rounded-lg hover:bg-neutral-100"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <X className="w-5 h-5" />
-          </button>
+            <X className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4 text-sm">
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs font-medium">
+            <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-xs font-medium">
               {errorMsg}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Nama Menu <span className="text-red-500">*</span>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">
+              Nama Menu <span className="text-destructive">*</span>
             </label>
             <input
               type="text"
@@ -122,16 +131,16 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
               placeholder="contoh: Ayam Bakar Madu"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-sm"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">Kategori</label>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">Kategori</label>
             <select
               value={kategori}
               onChange={(e) => setKategori(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-sm bg-white"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
             >
               {KATEGORI_OPTIONS.map((kat) => (
                 <option key={kat} value={kat}>
@@ -143,8 +152,8 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Harga (Rp) <span className="text-red-500">*</span>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
+                Harga (Rp) <span className="text-destructive">*</span>
               </label>
               <input
                 type="number"
@@ -154,12 +163,12 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
                 placeholder="20000"
                 value={harga}
                 onChange={(e) => setHarga(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-sm"
+                className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Sisa Porsi <span className="text-red-500">*</span>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
+                Sisa Porsi <span className="text-destructive">*</span>
               </label>
               <input
                 type="number"
@@ -168,39 +177,41 @@ export const MenuFormModal: React.FC<Props> = ({ isOpen, onClose, menuToEdit }) 
                 placeholder="10"
                 value={sisaPorsi}
                 onChange={(e) => setSisaPorsi(e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-sm"
+                className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
               />
-              <p className="text-[10px] text-neutral-500 mt-0.5">Isi 0 jika porsi habis</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Isi 0 jika porsi habis</p>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">Deskripsi Porsi</label>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">Deskripsi Porsi</label>
             <textarea
               rows={2}
               placeholder="Lauk + lalapan, sambal dipisah..."
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C85A32] text-sm"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
             />
           </div>
 
-          <div className="pt-3 border-t border-neutral-100 flex items-center justify-end gap-2">
-            <button
+          <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-lg transition"
             >
               Batal
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              size="sm"
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-[#C85A32] hover:bg-[#b44b25] rounded-lg shadow-sm transition active:scale-98 disabled:opacity-50"
+              className="gap-1.5 font-semibold"
             >
               <Check className="w-4 h-4" />
               {menuToEdit ? 'Simpan Perubahan' : 'Simpan Menu'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
