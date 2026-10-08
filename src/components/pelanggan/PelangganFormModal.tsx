@@ -28,7 +28,7 @@ export const PelangganFormModal: React.FC<Props> = ({
   useEffect(() => {
     if (pelangganToEdit) {
       setNama(pelangganToEdit.nama)
-      setNomorWhatsapp(pelangganToEdit.nomorWhatsapp)
+      setNomorWhatsapp(pelangganToEdit.no_whatsapp || pelangganToEdit.nomorWhatsapp || '')
       setAlamat(pelangganToEdit.alamat)
       setCatatan(pelangganToEdit.catatan || '')
     } else {
@@ -48,6 +48,10 @@ export const PelangganFormModal: React.FC<Props> = ({
 
     if (!nama.trim()) {
       setErrorMsg('Nama pelanggan wajib diisi')
+      return
+    }
+    if (!nomorWhatsapp.trim()) {
+      setErrorMsg('Nomor WhatsApp wajib diisi')
       return
     }
     if (!alamat.trim()) {
@@ -84,10 +88,10 @@ export const PelangganFormModal: React.FC<Props> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-card w-full max-w-md rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[88vh] relative z-50">
+        {/* Header Sticky */}
+        <div className="shrink-0 flex items-center justify-between px-5 py-4 border-b border-border bg-slate-50/80 dark:bg-muted/30">
           <h2 className="font-heading font-semibold text-foreground text-sm">
             {pelangganToEdit ? 'Ubah Data Pelanggan' : 'Tambah Pelanggan Baru'}
           </h2>
@@ -95,14 +99,18 @@ export const PelangganFormModal: React.FC<Props> = ({
             variant="ghost"
             size="icon-xs"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4 text-sm">
+        {/* Form Body Scrollable */}
+        <form
+          id="pelanggan-form"
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto p-5 space-y-4 text-sm bg-white dark:bg-card overscroll-contain"
+        >
           {errorMsg && (
             <div className="p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-xl text-xs font-medium">
               {errorMsg}
@@ -119,7 +127,7 @@ export const PelangganFormModal: React.FC<Props> = ({
               placeholder="contoh: Ibu Maya"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-white dark:bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm shadow-2xs"
             />
           </div>
 
@@ -133,9 +141,9 @@ export const PelangganFormModal: React.FC<Props> = ({
               placeholder="081234567890"
               value={nomorWhatsapp}
               onChange={(e) => setNomorWhatsapp(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-white dark:bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm font-mono shadow-2xs"
             />
-            <p className="text-[10px] text-muted-foreground mt-1">Nomor harus unik & aktif di WhatsApp</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Nomor harus diawali 08 (10-13 digit)</p>
           </div>
 
           <div>
@@ -148,7 +156,7 @@ export const PelangganFormModal: React.FC<Props> = ({
               placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..."
               value={alamat}
               onChange={(e) => setAlamat(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-white dark:bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm shadow-2xs"
             />
           </div>
 
@@ -161,30 +169,33 @@ export const PelangganFormModal: React.FC<Props> = ({
               placeholder="Patokan rumah, titip sekuriti, dll."
               value={catatan}
               onChange={(e) => setCatatan(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+              className="w-full px-3 py-2 border border-input rounded-xl bg-white dark:bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm shadow-2xs"
             />
           </div>
-
-          <div className="pt-3 border-t border-border flex items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={loading}
-              className="gap-1.5 font-semibold"
-            >
-              <Check className="w-4 h-4" />
-              {pelangganToEdit ? 'Simpan Perubahan' : 'Simpan Pelanggan'}
-            </Button>
-          </div>
         </form>
+
+        {/* Footer Sticky */}
+        <div className="shrink-0 p-4 border-t border-border bg-slate-50/90 dark:bg-card/90 flex items-center justify-end gap-2 backdrop-blur-xs">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="cursor-pointer"
+          >
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            form="pelanggan-form"
+            size="sm"
+            disabled={loading}
+            className="gap-1.5 font-semibold cursor-pointer shadow-xs"
+          >
+            <Check className="w-4 h-4" />
+            {pelangganToEdit ? 'Simpan Perubahan' : 'Simpan Pelanggan'}
+          </Button>
+        </div>
       </div>
     </div>
   )

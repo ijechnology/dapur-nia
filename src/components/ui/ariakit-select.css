@@ -1,0 +1,153 @@
+.ariakit-select-button {
+  --border: rgb(0 0 0/13%);
+  --highlight: rgb(255 255 255/20%);
+  --shadow: rgb(0 0 0/10%);
+  display: flex;
+  height: 2.375rem;
+  user-select: none;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  border-radius: 0.75rem;
+  border-style: none;
+  background-color: white;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: #0f172a;
+  text-decoration-line: none;
+  outline-width: 2px;
+  outline-offset: 2px;
+  outline-color: hsl(24 95% 53%);
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    inset 0 2px 0 var(--highlight),
+    inset 0 -1px 0 var(--shadow),
+    0 1px 1px var(--shadow);
+  width: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ariakit-select-button:where(.dark, .dark *) {
+  --border: rgb(255 255 255/12%);
+  --highlight: rgb(255 255 255/5%);
+  --shadow: rgb(0 0 0/25%);
+  background-color: hsl(222.2 84% 4.9% / 0.6);
+  color: #f8fafc;
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    inset 0 -1px 0 1px var(--shadow),
+    inset 0 1px 0 var(--highlight);
+}
+
+.ariakit-select-button:not(:active):hover {
+  --border: rgb(0 0 0/33%);
+}
+
+.ariakit-select-button:where(.dark, .dark *):not(:active):hover {
+  --border: rgb(255 255 255/25%);
+}
+
+.ariakit-select-button[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ariakit-select-button[data-focus-visible] {
+  outline-style: solid;
+}
+
+.ariakit-select-button:active,
+.ariakit-select-button[data-active] {
+  padding-top: 0.125rem;
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    inset 0 2px 0 var(--border);
+}
+
+@media (min-width: 640px) {
+  .ariakit-select-button {
+    gap: 0.5rem;
+  }
+}
+
+.ariakit-select-button:active:where(.dark, .dark *),
+.ariakit-select-button[data-active]:where(.dark, .dark *) {
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    inset 0 1px 1px 1px var(--shadow);
+}
+
+.ariakit-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+}
+
+.ariakit-select-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.ariakit-select-popover {
+  z-index: 9999;
+  display: flex;
+  max-height: min(var(--popover-available-height, 300px), 300px);
+  flex-direction: column;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: 0.75rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(204 20% 88%);
+  background-color: white;
+  padding: 0.375rem;
+  color: #0f172a;
+  box-shadow:
+    0 10px 25px -5px rgb(0 0 0 / 0.15),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.ariakit-select-popover:focus-visible,
+.ariakit-select-popover[data-focus-visible] {
+  outline: 2px solid hsl(24 95% 53%);
+  outline-offset: -1px;
+}
+
+.ariakit-select-popover:where(.dark, .dark *) {
+  border-color: hsl(204 4% 24%);
+  background-color: hsl(222.2 84% 6%);
+  color: #f8fafc;
+  box-shadow:
+    0 10px 25px -5px rgb(0 0 0 / 0.35),
+    0 8px 10px -6px rgb(0 0 0 / 0.2);
+}
+
+.ariakit-select-item {
+  display: flex;
+  cursor: pointer;
+  scroll-margin: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  outline: none !important;
+  transition: background-color 0.15s ease;
+}
+
+.ariakit-select-item[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ariakit-select-item[data-active-item] {
+  background-color: hsl(24 95% 53%);
+  color: white;
+}

@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon, DollarSign, PackageCheck, ShoppingCart, Downl
 import { Pesanan, DailyReportSummary } from '../../types'
 import { subscribePesanan } from '../../services/pesananService'
 import { calculateDailyReport } from '../../lib/validation'
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Card, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
 import jsPDF from 'jspdf'
@@ -27,7 +27,9 @@ export const LaporanTab: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const ordersOnDate = allOrders.filter((o) => o.tanggalPesanan === selectedDateStr)
+    const ordersOnDate = allOrders.filter(
+      (o) => (o.tanggal || o.tanggalPesanan || '').split('T')[0] === selectedDateStr
+    )
     const summary = calculateDailyReport(ordersOnDate, selectedDateStr)
     setReport(summary)
   }, [allOrders, selectedDateStr])
@@ -113,52 +115,60 @@ export const LaporanTab: React.FC = () => {
         </Button>
       </div>
 
-      {/* Date Picker Card menggunakan UI Shadcn Calendar (Poin 8) */}
-      <Card size="sm" className="overflow-hidden">
-        <CardContent className="p-3.5 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowCalendar(!showCalendar)}
-              className="gap-2 text-xs font-medium justify-between flex-1"
-            >
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="w-3.5 h-3.5 text-primary" />
-                <span>
-                  {selectedDateObj
-                    ? selectedDateObj.toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })
-                    : 'Pilih Tanggal'}
-                </span>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-            </Button>
-
-            <div className="flex items-center gap-1">
-              <Button
-                variant={selectedDateStr === new Date().toISOString().split('T')[0] ? 'default' : 'secondary'}
-                size="xs"
-                onClick={() => setQuickDate(0)}
-              >
-                Hari Ini
-              </Button>
-              <Button
-                variant="secondary"
-                size="xs"
-                onClick={() => setQuickDate(-1)}
-              >
-                Kemarin
-              </Button>
+      {/* Date Picker Bar */}
+      <div className="relative z-30">
+        <div className="p-3.5 bg-card rounded-2xl border border-border flex items-center justify-between gap-2 shadow-xs">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowCalendar((prev) => !prev)}
+            className="gap-2 text-xs font-medium justify-between flex-1 cursor-pointer hover:border-primary/50"
+          >
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-3.5 h-3.5 text-primary" />
+              <span className="font-semibold text-foreground">
+                {selectedDateObj
+                  ? selectedDateObj.toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : 'Pilih Tanggal'}
+              </span>
             </div>
-          </div>
+            <ChevronDown className="w-3.5 h-3.5 opacity-50" />
+          </Button>
 
-          {/* Kalender Shadcn dropdown */}
-          {showCalendar && (
-            <div className="flex justify-center border-t border-border pt-3 animate-in fade-in zoom-in-95 duration-150">
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant={selectedDateStr === new Date().toISOString().split('T')[0] ? 'default' : 'secondary'}
+              size="xs"
+              onClick={() => setQuickDate(0)}
+            >
+              Hari Ini
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              onClick={() => setQuickDate(-1)}
+            >
+              Kemarin
+            </Button>
+          </div>
+        </div>
+
+        {/* Kalender Shadcn dropdown melayang di atas konten (Floating Dropdown) */}
+        {showCalendar && (
+          <>
+            {/* Backdrop click outside to close */}
+            <div
+              className="fixed inset-0 z-40 bg-black/5"
+              onClick={() => setShowCalendar(false)}
+            />
+            <div className="absolute top-full left-0 mt-2 z-50 flex justify-center bg-card border border-border shadow-2xl rounded-2xl p-2 animate-in fade-in zoom-in-95 duration-150">
               <Calendar
                 mode="single"
                 selected={selectedDateObj}
@@ -168,12 +178,11 @@ export const LaporanTab: React.FC = () => {
                     setShowCalendar(false)
                   }
                 }}
-                className="rounded-xl border border-border bg-card shadow-xs"
               />
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </>
+        )}
+      </div>
 
       {/* Stat Summary Widgets */}
       <div className="grid grid-cols-2 gap-3">
@@ -210,22 +219,22 @@ export const LaporanTab: React.FC = () => {
       </div>
 
       {/* Rincian Porsi per Menu */}
-      <Card size="sm">
-        <CardHeader className="py-3 border-b border-border flex items-center justify-between">
-          <CardTitle className="text-xs font-semibold text-foreground">
+      <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+        <div className="px-4 py-3.5 border-b border-border flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-foreground">
             Rincian Menu Terjual ({selectedDateStr})
-          </CardTitle>
-          <span className="text-[11px] text-muted-foreground">
+          </h3>
+          <span className="text-[11px] text-muted-foreground font-medium">
             {Object.keys(report?.itemSales || {}).length} menu
           </span>
-        </CardHeader>
+        </div>
 
         {report && Object.keys(report.itemSales).length > 0 ? (
           <div className="divide-y divide-border text-xs">
             {Object.entries(report.itemSales).map(([menuId, item]) => (
               <div
                 key={menuId}
-                className="p-3.5 flex items-center justify-between hover:bg-muted/40 transition"
+                className="p-4 flex items-center justify-between hover:bg-muted/40 transition"
               >
                 <div>
                   <p className="font-semibold text-foreground">{item.namaMenu}</p>
@@ -252,7 +261,7 @@ export const LaporanTab: React.FC = () => {
             </p>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   )
 }

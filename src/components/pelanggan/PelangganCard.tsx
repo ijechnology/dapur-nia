@@ -2,6 +2,7 @@ import React from 'react'
 import { MapPin, Phone, MessageSquare, Edit2, Trash2 } from 'lucide-react'
 import { Pelanggan } from '../../types'
 import { deletePelanggan } from '../../services/pelangganService'
+import { useAlert } from '../../context/AlertContext'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 
@@ -11,24 +12,28 @@ interface Props {
 }
 
 export const PelangganCard: React.FC<Props> = ({ pelanggan, onEdit }) => {
+  const { showAlert } = useAlert()
+
   const handleDelete = async () => {
     if (confirm(`Yakin ingin menghapus pelanggan "${pelanggan.nama}"?`)) {
       try {
         await deletePelanggan(pelanggan.id)
-      } catch (err) {
-        console.error(err)
+        showAlert('Pelanggan Dihapus', `Data "${pelanggan.nama}" berhasil dihapus.`)
+      } catch (err: any) {
+        showAlert('Gagal Menghapus', err.message || 'Terjadi kesalahan', 'destructive')
       }
     }
   }
 
+  const rawWa = pelanggan.nomorWhatsapp || ''
   const waUrl = `https://wa.me/${
-    pelanggan.nomorWhatsapp.startsWith('0')
-      ? '62' + pelanggan.nomorWhatsapp.slice(1)
-      : pelanggan.nomorWhatsapp
+    rawWa.startsWith('0')
+      ? '62' + rawWa.slice(1)
+      : rawWa
   }`
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 transition-all shadow-sm hover:shadow-md">
+    <div className="rounded-2xl border border-border bg-card p-4 transition-all shadow-sm hover:shadow-md hover:border-primary/30">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1.5 flex-1">
           <h3 className="font-heading text-base font-semibold text-foreground tracking-tight">
@@ -37,7 +42,7 @@ export const PelangganCard: React.FC<Props> = ({ pelanggan, onEdit }) => {
 
           <div className="flex items-center gap-2 pt-0.5">
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-mono">
-              <Phone className="w-3 h-3" />
+              <Phone className="w-3 h-3 text-primary" />
               {pelanggan.nomorWhatsapp}
             </span>
             <a

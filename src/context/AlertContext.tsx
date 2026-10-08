@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
+import { CheckCircle2, AlertCircle } from 'lucide-react'
 
 export interface AlertNotification {
   id: string
@@ -39,8 +40,12 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
             }`}
           >
             <div className="flex items-start gap-2.5">
-              <span className="text-lg">
-                {item.variant === 'destructive' ? '⚠️' : '✅'}
+              <span className="shrink-0 mt-0.5">
+                {item.variant === 'destructive' ? (
+                  <AlertCircle className="w-4 h-4 text-destructive" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                )}
               </span>
               <div className="flex-1 min-w-0">
                 <h5 className="font-semibold text-sm leading-none tracking-tight">{item.title}</h5>

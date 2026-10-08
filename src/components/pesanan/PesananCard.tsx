@@ -1,6 +1,6 @@
 import React from 'react'
 import { ChevronRight, Clock, CheckCircle2, ChefHat } from 'lucide-react'
-import { Pesanan, OrderStatus } from '../../types'
+import { Pesanan } from '../../types'
 import { Badge } from '../ui/badge'
 
 interface Props {
@@ -9,16 +9,31 @@ interface Props {
 }
 
 const STATUS_CONFIG: Record<
-  OrderStatus,
+  string,
   { text: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: any }
 > = {
+  menunggu_bayar: {
+    text: 'Menunggu Bayar',
+    variant: 'outline',
+    icon: Clock,
+  },
+  menunggu: {
+    text: 'Menunggu Bayar',
+    variant: 'outline',
+    icon: Clock,
+  },
   menunggu_pembayaran: {
     text: 'Menunggu Bayar',
     variant: 'outline',
     icon: Clock,
   },
+  dibayar: {
+    text: 'Dibayar',
+    variant: 'secondary',
+    icon: CheckCircle2,
+  },
   dikonfirmasi: {
-    text: 'Dikonfirmasi',
+    text: 'Dibayar',
     variant: 'secondary',
     icon: CheckCircle2,
   },
@@ -32,14 +47,29 @@ const STATUS_CONFIG: Record<
     variant: 'default',
     icon: CheckCircle2,
   },
+  dibatalkan: {
+    text: 'Dibatalkan',
+    variant: 'destructive',
+    icon: Clock,
+  },
 }
 
 export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
-  const config = STATUS_CONFIG[pesanan.status] || STATUS_CONFIG.menunggu_pembayaran
+  const config = STATUS_CONFIG[pesanan.status] || STATUS_CONFIG.menunggu_bayar
   const Icon = config.icon
 
-  const totalPorsi = pesanan.items.reduce((sum, i) => sum + i.jumlahPorsi, 0)
-  const itemsText = pesanan.items.map((i) => `${i.namaMenu} (${i.jumlahPorsi})`).join(', ')
+  const totalPorsi = pesanan.items && pesanan.items.length > 0
+    ? pesanan.items.reduce((sum, i) => sum + Number(i.jumlah_porsi ?? i.jumlahPorsi ?? 0), 0)
+    : Number(pesanan.jumlah_porsi || 0)
+
+  const itemsText = pesanan.items && pesanan.items.length > 0
+    ? pesanan.items.map((i) => `${i.nama_menu || i.namaMenu} (${i.jumlah_porsi ?? i.jumlahPorsi}x)`).join(', ')
+    : (pesanan.nama_menu ? `${pesanan.nama_menu} (${pesanan.jumlah_porsi} porsi)` : '-')
+
+  const customerName = pesanan.nama_pelanggan || pesanan.pelangganSnapshot?.nama || 'Pelanggan'
+  const nomorOrder = pesanan.nomorPesanan || pesanan.id
+  const orderDate = pesanan.tanggalPesanan || pesanan.tanggal || '-'
+  const grandTotal = pesanan.total ?? pesanan.totalTagihan ?? 0
 
   return (
     <div
@@ -50,7 +80,7 @@ export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono text-muted-foreground">
-              {pesanan.nomorPesanan}
+              {nomorOrder}
             </span>
             <Badge variant={config.variant} className="gap-1 text-[10px] py-0.5">
               <Icon className="w-2.5 h-2.5" />
@@ -59,7 +89,7 @@ export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
           </div>
 
           <h3 className="font-heading text-base font-semibold text-foreground tracking-tight pt-0.5">
-            {pesanan.pelangganSnapshot.nama}
+            {customerName}
           </h3>
         </div>
 
@@ -72,10 +102,10 @@ export const PesananCard: React.FC<Props> = ({ pesanan, onClick }) => {
 
       <div className="mt-3.5 pt-3 border-t border-border flex items-center justify-between text-xs">
         <span className="text-muted-foreground text-[11px] font-mono">
-          {pesanan.tanggalPesanan}
+          {orderDate}
         </span>
         <span className="font-bold text-primary tabular-nums text-sm">
-          Rp {pesanan.totalTagihan.toLocaleString('id-ID')}
+          Rp {grandTotal.toLocaleString('id-ID')}
         </span>
       </div>
     </div>

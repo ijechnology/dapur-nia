@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
 import { getFirestore, Firestore } from 'firebase/firestore'
+import { getAuth, Auth } from 'firebase/auth'
 
 export interface FirebaseConfig {
   apiKey: string
@@ -30,9 +31,10 @@ export function getEnvFirebaseConfig(): FirebaseConfig | null {
 
 let appInstance: FirebaseApp | null = null
 let dbInstance: Firestore | null = null
+let authInstance: Auth | null = null
 
-export function getFirebaseDb(): Firestore | null {
-  if (dbInstance) return dbInstance
+export function getFirebaseApp(): FirebaseApp | null {
+  if (appInstance) return appInstance
 
   const config = getEnvFirebaseConfig()
   if (!config || !config.apiKey || !config.projectId) {
@@ -45,10 +47,37 @@ export function getFirebaseDb(): Firestore | null {
     } else {
       appInstance = getApp()
     }
-    dbInstance = getFirestore(appInstance)
+    return appInstance
+  } catch (error) {
+    console.error('Gagal menginisialisasi Firebase App:', error)
+    return null
+  }
+}
+
+export function getFirebaseDb(): Firestore | null {
+  if (dbInstance) return dbInstance
+  const app = getFirebaseApp()
+  if (!app) return null
+
+  try {
+    dbInstance = getFirestore(app)
     return dbInstance
   } catch (error) {
     console.error('Gagal menginisialisasi Cloud Firestore:', error)
+    return null
+  }
+}
+
+export function getFirebaseAuth(): Auth | null {
+  if (authInstance) return authInstance
+  const app = getFirebaseApp()
+  if (!app) return null
+
+  try {
+    authInstance = getAuth(app)
+    return authInstance
+  } catch (error) {
+    console.error('Gagal menginisialisasi Firebase Auth:', error)
     return null
   }
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   validateMenuInput,
+  validatePesananInput,
   normalizeWhatsApp,
   isValidWhatsApp,
   canTransitionStatus,
@@ -90,29 +91,49 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
       const orders: Pesanan[] = [
         {
           id: '1',
+          pelanggan_id: '08123',
+          nama_pelanggan: 'Budi',
+          alamat_kirim: 'Jl Mawar',
+          menu_id: 'm1',
+          nama_menu: 'Ayam Bakar',
+          harga_satuan: 20000,
+          jumlah_porsi: 2,
+          ongkir: 5000,
+          total: 45000,
           nomorPesanan: 'DN-001',
           pelangganId: 'p1',
           pelangganSnapshot: { nama: 'Budi', nomorWhatsapp: '08123', alamat: 'Jl Mawar' },
           items: [
-            { menuId: 'm1', namaMenu: 'Ayam Bakar', hargaSaatPesan: 20000, jumlahPorsi: 2, subtotal: 40000 }
+            { menu_id: 'm1', nama_menu: 'Ayam Bakar', menuId: 'm1', namaMenu: 'Ayam Bakar', harga_satuan: 20000, hargaSaatPesan: 20000, jumlah_porsi: 2, jumlahPorsi: 2, subtotal: 40000 }
           ],
           ongkosKirim: 5000,
           totalTagihan: 45000,
           tanggalPesanan: '2026-10-02',
+          tanggal: '2026-10-02',
           waktuPesan: new Date(),
           status: 'selesai'
         },
         {
           id: '2',
+          pelanggan_id: '08124',
+          nama_pelanggan: 'Siti',
+          alamat_kirim: 'Jl Melati',
+          menu_id: 'm1',
+          nama_menu: 'Ayam Bakar',
+          harga_satuan: 20000,
+          jumlah_porsi: 3,
+          ongkir: 5000,
+          total: 65000,
           nomorPesanan: 'DN-002',
           pelangganId: 'p2',
           pelangganSnapshot: { nama: 'Siti', nomorWhatsapp: '08124', alamat: 'Jl Melati' },
           items: [
-            { menuId: 'm1', namaMenu: 'Ayam Bakar', hargaSaatPesan: 20000, jumlahPorsi: 3, subtotal: 60000 }
+            { menu_id: 'm1', nama_menu: 'Ayam Bakar', menuId: 'm1', namaMenu: 'Ayam Bakar', harga_satuan: 20000, hargaSaatPesan: 20000, jumlah_porsi: 3, jumlahPorsi: 3, subtotal: 60000 }
           ],
           ongkosKirim: 5000,
           totalTagihan: 65000,
           tanggalPesanan: '2026-10-02',
+          tanggal: '2026-10-02',
           waktuPesan: new Date(),
           status: 'diproses'
         }
@@ -124,6 +145,39 @@ describe('Task 2: Logika Bisnis & Validasi Invarian Dapur Nia', () => {
       expect(report.totalPesananSukses).toBe(2)
       expect(report.itemSales['m1'].porsi).toBe(5)
       expect(report.itemSales['m1'].nominal).toBe(100000)
+    })
+  })
+
+  describe('Invarian Form Pesanan (Ongkir Min 10k & Multi-Item)', () => {
+    it('menolak pesanan jika ongkir kurang dari Rp 10.000', () => {
+      const mockItems: OrderItem[] = [
+        { menuId: 'm1', namaMenu: 'Ayam Bakar', hargaSaatPesan: 20000, jumlahPorsi: 1, subtotal: 20000 }
+      ]
+      const resultZero = validatePesananInput({ pelangganId: 'p1', items: mockItems, ongkosKirim: 0 })
+      const resultUnder = validatePesananInput({ pelangganId: 'p1', items: mockItems, ongkosKirim: 5000 })
+      const resultValid = validatePesananInput({ pelangganId: 'p1', items: mockItems, ongkosKirim: 10000 })
+
+      expect(resultZero.isValid).toBe(false)
+      expect(resultZero.error).toContain('10.000')
+
+      expect(resultUnder.isValid).toBe(false)
+      expect(resultUnder.error).toContain('10.000')
+
+      expect(resultValid.isValid).toBe(true)
+    })
+
+    it('menolak pesanan tanpa pelanggan atau tanpa item menu', () => {
+      const mockItems: OrderItem[] = [
+        { menuId: 'm1', namaMenu: 'Ayam Bakar', hargaSaatPesan: 20000, jumlahPorsi: 1, subtotal: 20000 }
+      ]
+      const noPelanggan = validatePesananInput({ pelangganId: '', items: mockItems, ongkosKirim: 10000 })
+      const noItems = validatePesananInput({ pelangganId: 'p1', items: [], ongkosKirim: 10000 })
+
+      expect(noPelanggan.isValid).toBe(false)
+      expect(noPelanggan.error).toContain('pelanggan')
+
+      expect(noItems.isValid).toBe(false)
+      expect(noItems.error).toContain('minimal 1 menu')
     })
   })
 })
